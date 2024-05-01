@@ -25,7 +25,7 @@
 #define TFT_RST 8
 #define SD_CS 6
 
-const int buttonPin = 2;
+const int buttonPin = 5; // Gele knop 
 int buttonState;         
 int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
@@ -41,24 +41,28 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 //Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 
 void setup() {
-   pinMode(2, INPUT);
+   pinMode(5, INPUT);
   
   tft.begin();
   tft.setRotation(2); // Aanpasbaar naar scherm orientatie
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE);
   tft.setTextSize(2);
-  tft.println(button_clicks);
   
     if (!SD.begin(SD_CS)) {
     tft.println("SD card initialization failed!");
     return;
     
   }
-  tft.println("SD card contents:");
-  printDirectory(SD.open("/"), 0);
+
+  tft.println("Druk op de knop om SD-inhoud te zien");
+
+ 
+  
   
 }
+
+//test
 
 void loop() {
   int reading = digitalRead(buttonPin);
@@ -73,10 +77,14 @@ void loop() {
       buttonState = reading;
 
       if (buttonState == HIGH) {
-        button_clicks = button_clicks + 1;
+        while (digitalRead(5) == LOW) {
+          delay(50);  
+        }   
+  
+        tft.fillScreen(ILI9341_BLACK);
         tft.setCursor(0, 0);
-        clearLine(0);
-        tft.println(button_clicks);
+        tft.println("SD card contents:");
+        printDirectory(SD.open("/"), 0);
         
       }
     }
