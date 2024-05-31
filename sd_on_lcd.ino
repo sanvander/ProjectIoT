@@ -1,36 +1,20 @@
-/***************************************************
-  This is our GFX example for the Adafruit ILI9341 Breakout and Shield
-  ----> http://www.adafruit.com/products/1651
-
-  Check out the links above for our tutorials and wiring diagrams
-  These displays use SPI to communicate, 4 or 5 pins are required to
-  interface (RST is optional)
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
-
-
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
 #include "SD.h"
 
-// For the Adafruit shield, these are the default.
+
 #define TFT_DC 9
 #define TFT_CS 10
 #define TFT_RST 8
 #define SD_CS 6
 
-const int buttonPin = 2;
+const int buttonPin = 5; // Gele knop 
 int buttonState;         
 int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
-const int interval = 50; // Interval in milliseconden (1 seconde)
+const int interval = 50; 
 unsigned long previousMillis = 0;
 
 int button_clicks = 0;
@@ -41,23 +25,20 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 //Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 
 void setup() {
-   pinMode(2, INPUT);
-  
+  pinMode(5, INPUT);
   tft.begin();
   tft.setRotation(2); // Aanpasbaar naar scherm orientatie
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE);
   tft.setTextSize(2);
-  tft.println(button_clicks);
   
     if (!SD.begin(SD_CS)) {
     tft.println("SD card initialization failed!");
     return;
     
   }
-  tft.println("SD card contents:");
-  printDirectory(SD.open("/"), 0);
-  
+
+  tft.println("Druk op de knop om SD-inhoud te zien");
 }
 
 void loop() {
@@ -73,24 +54,23 @@ void loop() {
       buttonState = reading;
 
       if (buttonState == HIGH) {
-        button_clicks = button_clicks + 1;
+        while (digitalRead(5) == LOW) {
+          delay(50);  
+        }   
+  
+        tft.fillScreen(ILI9341_BLACK);
         tft.setCursor(0, 0);
-        clearLine(0);
-        tft.println(button_clicks);
+        tft.println("SD card contents:");
+        printDirectory(SD.open("/"), 0);
         
       }
     }
   }
   lastButtonState = reading;
 
-
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
   }
-  
-
-
-
 }
 
 void printDirectory(File dir, int numTabs) {
@@ -113,6 +93,5 @@ void printDirectory(File dir, int numTabs) {
 
 void clearLine(int y) {
   tft.fillRect(0, y, tft.width(), 20, ILI9341_BLACK);
-  // tft.textHeight() geeft de hoogte van de huidige tekstgrootte
 }
 
