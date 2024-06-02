@@ -9,15 +9,12 @@
 #define TFT_RST 8
 #define SD_CS 6
 
-const int buttonPin = 5; // Gele knop 
+const int buttonPin = 5; 
 int buttonState;         
 int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
-const int interval = 50; 
-unsigned long previousMillis = 0;
 
-int button_clicks = 0;
 
 // Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
@@ -35,15 +32,12 @@ void setup() {
     if (!SD.begin(SD_CS)) {
     tft.println("SD card initialization failed!");
     return;
-    
   }
-
   tft.println("Druk op de knop om SD-inhoud te zien");
 }
 
 void loop() {
   int reading = digitalRead(buttonPin);
-  unsigned long currentMillis = millis();
 
   if (reading != lastButtonState) {
     lastDebounceTime = millis();
@@ -67,11 +61,8 @@ void loop() {
     }
   }
   lastButtonState = reading;
-
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-  }
 }
+
 
 void printDirectory(File dir, int numTabs) {
   while (true) {
@@ -90,8 +81,3 @@ void printDirectory(File dir, int numTabs) {
     entry.close();
   }
 }
-
-void clearLine(int y) {
-  tft.fillRect(0, y, tft.width(), 20, ILI9341_BLACK);
-}
-
